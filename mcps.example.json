@@ -1,0 +1,28 @@
+{
+  "_comment": "Copy to ~/.omni-lilith/mcps.json and adjust paths.",
+
+  "memory": {
+    "command": "python3",
+    "args": ["/home/user/Playground/omni-lilith/mcps/memory/server.py"],
+    "env": {
+      "MEMORY_FILE_PATH": "/home/user/.omni-lilith/memory/knowledge_graph.jsonl"
+    }
+  },
+
+  "sequential_thinking": {
+    "command": "python3",
+    "args": ["/home/user/Playground/omni-lilith/mcps/sequential_thinking/server.py"]
+  },
+
+  "fetch": {
+    "command": "python3",
+    "args": ["-m", "mcp_server_fetch"],
+    "env": {}
+  },
+
+  "time": {
+    "command": "python3",
+    "args": ["-m", "mcp_server_time"],
+    "env": {}
+  }
+}
