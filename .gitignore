@@ -220,4 +220,5 @@ __marimo__/
 *.key
 *.pem
 .claude
+tests/
 TODO.md
