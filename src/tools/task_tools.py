@@ -19,7 +19,7 @@ class _TaskEntry:
     asyncio_task: asyncio.Task | None = None
 
 
-def _get(task_id: str) -> _TaskEntry | None:
+def _find(task_id: str) -> _TaskEntry | None:
     return _tasks.get(task_id)
 
 
@@ -110,7 +110,7 @@ _GET_SCHEMA = {
 
 
 async def _get(args: dict, ctx) -> ToolResult:
-    entry = _get(args["taskId"])
+    entry = _find(args["taskId"])
     if entry is None:
         return ToolResult(
             content=[
