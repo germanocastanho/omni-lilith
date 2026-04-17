@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 import logging
 from pathlib import Path
@@ -19,12 +20,12 @@ _EMPTY: dict[str, Any] = {
 
 def _load() -> dict[str, Any]:
     if not _MEMORY_PATH.exists():
-        return dict(_EMPTY)
+        return copy.deepcopy(_EMPTY)
     try:
         return json.loads(_MEMORY_PATH.read_text())
     except Exception:
         logger.warning("LTM: could not read memory file, starting fresh")
-        return dict(_EMPTY)
+        return copy.deepcopy(_EMPTY)
 
 
 def _save(data: dict[str, Any]) -> None:
