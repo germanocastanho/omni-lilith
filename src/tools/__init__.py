@@ -14,6 +14,7 @@ from src.tools.lsp_tool import TOOL as LSPTool
 from src.tools.mcp_auth_tool import TOOL as McpAuthTool
 from src.tools.mcp_resource_tools import LIST_MCP_RESOURCES, READ_MCP_RESOURCE
 from src.tools.mcp_tool import TOOL as MCPTool
+from src.tools.nest_tool import TOOL as NestRunTool
 from src.tools.notebook_edit_tool import TOOL as NotebookEditTool
 from src.tools.plan_mode_tools import ENTER_PLAN_MODE, EXIT_PLAN_MODE
 from src.tools.powershell_tool import TOOL as PowerShellTool
@@ -53,6 +54,7 @@ ALL_TOOLS: list[Tool] = [
     WebFetchTool,
     WebSearchTool,
     # Agent & Tasks
+    NestRunTool,
     AgentTool,
     TASK_CREATE,
     TASK_LIST,

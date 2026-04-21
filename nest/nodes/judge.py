@@ -4,7 +4,7 @@ import json
 import logging
 import re
 
-from framework.graph.node import NodeContext, NodeProtocol, NodeResult
+from nest.types import NodeContext, NodeProtocol, NodeResult
 
 from nest.identity import PRINCIPLES_SHORT
 

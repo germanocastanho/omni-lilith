@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from framework.graph import (
+from nest.spec import (
     EdgeCondition,
     EdgeSpec,
     Goal,
@@ -245,7 +245,7 @@ LILITH_GRAPH = GraphSpec(
     edges=_EDGES,
     conversation_mode="continuous",
     identity_prompt=LILITH_IDENTITY,
-    default_model="claude-opus-4-6",
+    default_model="claude-sonnet-4-6",
     loop_config={
         "max_iterations": 64,
         "max_tool_calls_per_turn": 32,

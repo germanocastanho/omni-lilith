@@ -26,11 +26,9 @@ _STORAGE_PATH = Path.home() / ".omni-lilith" / "nest"
 
 
 def _build_executor(model: str, verbose: bool):
-    from framework.graph import GraphExecutor
-    from framework.llm.anthropic import AnthropicProvider
-    from framework.runtime.core import Runtime
-
+    from nest.executor import GraphExecutor, Runtime
     from nest.graph import LILITH_GRAPH
+    from nest.llm import AnthropicLLM
     from nest.memory import get_memory_prompt
     from nest.nodes import DoneNode, HITLNode, JudgeNode, RouterNode
     from nest.tools.catalog import ALL_TOOLS, make_tool_executor
@@ -40,7 +38,7 @@ def _build_executor(model: str, verbose: bool):
         _console.print("[bold red]Error:[/] API key not set. Check your .env file.")
         sys.exit(1)
 
-    llm = AnthropicProvider(api_key=api_key, model=model)
+    llm = AnthropicLLM(api_key=api_key, model=model)
 
     storage_path = _STORAGE_PATH / "sessions"
     storage_path.mkdir(parents=True, exist_ok=True)
@@ -141,7 +139,7 @@ async def _repl(model: str, verbose: bool) -> None:
 
 
 def start_repl(
-    model: str = os.environ.get("LILITH_MODEL", "claude-opus-4-6"),
+    model: str = os.environ.get("LILITH_MODEL", "claude-sonnet-4-6"),
     verbose: bool = False,
 ) -> None:
     if verbose:

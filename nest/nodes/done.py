@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from framework.graph.node import NodeContext, NodeProtocol, NodeResult
+from nest.types import NodeContext, NodeProtocol, NodeResult
 
 import nest.memory as mem
 

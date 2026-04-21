@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-from framework.llm.provider import Tool, ToolResult, ToolUse
+from nest.types import Tool, ToolResult, ToolUse
 
 import nest.memory as mem
 

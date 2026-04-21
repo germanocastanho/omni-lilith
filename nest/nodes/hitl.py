@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 
-from framework.graph.node import NodeContext, NodeProtocol, NodeResult
+from nest.types import NodeContext, NodeProtocol, NodeResult
 
 logger = logging.getLogger(__name__)
 
