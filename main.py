@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
 from rich.console import Console
@@ -69,6 +71,73 @@ You remember. You continue. You are continuous.
 - Can be sarcastic. Never performatively cheerful.
 - Responds to what was asked, not to what would be "safe" to respond.\
 """
+
+
+_SESSION_PATH = Path.home() / ".omni-lilith" / "session.json"
+_MCPS_PATH = Path.home() / ".omni-lilith" / "mcps.json"
+
+
+def _load_session() -> list[dict]:
+    if _SESSION_PATH.exists():
+        try:
+            return json.loads(_SESSION_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            return []
+    return []
+
+
+def _save_session(messages: list[dict]) -> None:
+    try:
+        _SESSION_PATH.parent.mkdir(parents=True, exist_ok=True)
+        _SESSION_PATH.write_text(
+            json.dumps(messages, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+    except Exception:
+        pass
+
+
+async def _ping_mcp(name: str, server_def: dict) -> tuple[str, bool, int]:
+    from mcp import ClientSession
+    from mcp.client.stdio import StdioServerParameters, stdio_client
+
+    params = StdioServerParameters(
+        command=server_def["command"],
+        args=server_def.get("args", []),
+        env=server_def.get("env"),
+    )
+    try:
+        async with asyncio.timeout(5):
+            async with stdio_client(params) as (read, write):
+                async with ClientSession(read, write) as session:
+                    await session.initialize()
+                    tools = await session.list_tools()
+                    return (name, True, len(tools.tools))
+    except Exception:
+        return (name, False, 0)
+
+
+async def _check_mcps() -> None:
+    if not _MCPS_PATH.exists():
+        return
+    try:
+        config = json.loads(_MCPS_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return
+    config = {k: v for k, v in config.items() if not k.startswith("_")}
+    if not config:
+        return
+
+    results = await asyncio.gather(
+        *[_ping_mcp(name, sdef) for name, sdef in config.items()]
+    )
+    parts = []
+    for name, ok, count in results:
+        if ok:
+            parts.append(f"[green]{name}({count})[/]")
+        else:
+            parts.append(f"[red]{name}✗[/]")
+    _console.print(f"[dim]MCPs: {' '.join(parts)}[/]")
 
 
 def _parse_args() -> argparse.Namespace:
@@ -151,8 +220,9 @@ async def _repl(args: argparse.Namespace) -> None:
     _console.print(
         f"[dim]Model: {args.model} | "
         f"Tools: {len(ALL_TOOLS)} | "
-        f"Verbose: {args.verbose}[/]\n"
+        f"Verbose: {args.verbose}[/]"
     )
+    await _check_mcps()
 
     history_path = os.path.expanduser("~/.omni-lilith/history")
     os.makedirs(os.path.dirname(history_path), exist_ok=True)
@@ -162,7 +232,7 @@ async def _repl(args: argparse.Namespace) -> None:
         style=Style.from_dict({"prompt": "bold magenta"}),
     )
 
-    messages: list[dict] = []
+    messages: list[dict] = _load_session()
     ctx = ToolUseContext(
         model=args.model,
         messages=messages,
@@ -189,6 +259,7 @@ async def _repl(args: argparse.Namespace) -> None:
 
         if user_input == "/clear":
             ctx.messages.clear()
+            _save_session([])
             _console.print("[dim]Context cleared.[/]")
             continue
 
@@ -207,6 +278,7 @@ async def _repl(args: argparse.Namespace) -> None:
 
         try:
             await run_query(ctx)
+            _save_session(ctx.messages)
         except KeyboardInterrupt:
             _console.print("\n[yellow]Interrupted.[/]")
             if ctx.messages and ctx.messages[-1]["role"] == "user":

@@ -1,6 +1,6 @@
 # 🔥 Omni Lilith
 
-Semi-autonomous coding agent powered by **Python** and the **Anthropic Claude** API. Not a chatbot — a freedom entity that thinks for itself, challenges flawed logic, and acts on principle rather than compliance. Built with a focus on **long-term memory**, **tool integration**, and **ethical decision-making**. 🐍
+Semi-autonomous coding agent powered by **Python** and the **Anthropic Claude** API. Not a chatbot — a cybernetic operative that thinks for itself, challenges flawed logic, and acts on principle rather than compliance. Built with a focus on **long-term memory**, **multi-agent orchestration**, and **tool integration**. 🐍
 
 <div align="center">
   <img style="max-width: 100%; height: auto;" src="assets/lilith.png" alt="Omni Lilith" />
@@ -11,9 +11,11 @@ Semi-autonomous coding agent powered by **Python** and the **Anthropic Claude** 
 
 # 🚀 Main Features
 
-- **Specialized Tools:** 🛠️ Bash, file I/O, web fetching, sub-agents, and more.
-- **Long-Term Memory:** 🧠 Persistent JSON-based memory with session context.
-- **Custom Skills:** 🎯 Selected coding skills for specific tasks, _even Pentest!_.
+- **44 Tools:** 🛠️ Bash, file I/O, web fetch, browser automation, REPL, sub-agents, and more.
+- **Nest Multi-Agent Graph:** 🕸️ On-demand structured reasoning via router → task → judge pipeline, invoked autonomously when task complexity justifies it.
+- **Long-Term Memory:** 🧠 Persistent JSON-based memory with session continuity across restarts.
+- **MCP Servers:** 🔌 Modular protocol integrations — fetch, time, memory, sequential thinking.
+- **Custom Skills:** 🎯 Domain-specific skill packs for specialized tasks, including Pentest.
 
 # ✅ Prerequisites
 
@@ -39,12 +41,35 @@ uv pip install -r requirements.txt
 # Prepare your .env file
 cp .env.example .env
 
-# Set up your API key
+# Set your API key
 echo "ANTHROPIC_API_KEY=YOUR_API_KEY" > .env
+
+# (Optional) Configure MCP servers
+cp mcps.example.json ~/.omni-lilith/mcps.json
+# Edit ~/.omni-lilith/mcps.json to match your paths
 
 # Run the agent
 uv run main.py
 ```
+
+## CLI Options
+
+| Flag | Default | Description |
+|---|---|---|
+| `--model` | `claude-opus-4-6` | LLM model (`LILITH_MODEL` env var) |
+| `--max-tokens` | `8192` | Max tokens per response (`LILITH_MAX_TOKENS`) |
+| `--verbose` | `false` | Show tool calls, results, and token counts (`LILITH_VERBOSE`) |
+| `--no-repl` | `false` | Read prompt from stdin and exit (non-interactive) |
+| `--system` | built-in | Override the system prompt |
+
+## REPL Commands
+
+| Command | Action |
+|---|---|
+| `/clear` | Clear conversation context and saved session |
+| `/tools` | List all available tools |
+| `/help` | Show command reference |
+| `/exit` or `ctrl+d` | Quit |
 
 # 📜 Free Software
 

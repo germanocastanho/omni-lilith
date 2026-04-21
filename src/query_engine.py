@@ -31,6 +31,8 @@ async def run_query(ctx: ToolUseContext) -> str:
         response_text = ""
         tool_uses: list[dict[str, Any]] = []
         stop_reason = ""
+        input_tokens = 0
+        output_tokens = 0
 
         current_block: dict[str, Any] | None = None
         input_json_buf = ""
@@ -88,10 +90,26 @@ async def run_query(ctx: ToolUseContext) -> str:
                         current_block = None
                         input_json_buf = ""
 
+                elif etype == "RawMessageStartEvent":
+                    usage = getattr(
+                        getattr(event, "message", None), "usage", None
+                    )
+                    if usage:
+                        input_tokens = getattr(usage, "input_tokens", 0) or 0
+
                 elif etype == "RawMessageDeltaEvent":
                     stop_reason = getattr(
                         event.delta, "stop_reason", ""
                     ) or ""
+                    usage = getattr(event, "usage", None)
+                    if usage:
+                        output_tokens = getattr(usage, "output_tokens", 0) or 0
+
+        if ctx.verbose and (input_tokens or output_tokens):
+            _console.print(
+                f"[dim]  ↳ in={input_tokens} out={output_tokens} "
+                f"total={input_tokens + output_tokens}[/]"
+            )
 
         if response_text:
             final_text = response_text
@@ -185,8 +203,15 @@ async def _dispatch_tools(
             )
 
         if ctx.verbose:
-            status = "[red]error[/]" if result.is_error else "[green]ok[/]"
-            _console.print(f"  {status}")
+            status = "[red]✗[/]" if result.is_error else "[green]✓[/]"
+            preview = ""
+            for block in result.content:
+                if isinstance(block, dict) and block.get("type") == "text":
+                    raw = (block.get("text") or "").replace("\n", " ").strip()
+                    if raw:
+                        preview = f" [dim]{raw[:100]}{'…' if len(raw) > 100 else ''}[/]"
+                    break
+            _console.print(f"  {status}{preview}")
 
         results.append(
             {
